@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notification_db
+    username: postgres
+    password: Umobolnica93
+  jpa:
+    hibernate:
+      ddl-auto: update   # for dev; use 'validate' or migrations in prod
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+server:
+  port: 8085
+
+encryption:
+  service:
+    base-url: http://localhost:8082/encryption
