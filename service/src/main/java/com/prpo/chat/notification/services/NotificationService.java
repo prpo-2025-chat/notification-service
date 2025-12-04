@@ -21,10 +21,10 @@ public class NotificationService {
 
     @Transactional
     public Notification createMessageReceivedNotification(
-            Long messageId,
-            Long senderId,
-            Long recipientId,
-            Long channelId,
+            String messageId,
+            String senderId,
+            String recipientId,
+            String channelId,
             String encryptedPayload
     ) {
         Notification n = new Notification();
@@ -41,7 +41,7 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Notification> getNotifications(Long userId, NotificationStatus status) {
+    public List<Notification> getNotifications(String userId, NotificationStatus status) {
         if (status == null) {
             return notificationRepository.findByRecipientIdOrderByCreatedAtDesc(userId);
         }
@@ -49,7 +49,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public void markAsRead(Long notificationId, Long userId) {
+    public void markAsRead(String notificationId, String userId) {
         Notification n = notificationRepository.findById(notificationId)
             .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
 

@@ -7,13 +7,13 @@ import lombok.Data;
 public class MessageReceivedNotificationRequest {
 
     @NotNull
-    private Long messageId;
+    private String messageId;
 
     @NotNull
-    private Long senderId;
+    private String senderId;
 
     @NotNull
-    private Long channelId;
+    private String channelId;
 
     @NotNull
     private String text;

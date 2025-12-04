@@ -34,11 +34,11 @@ public class InternalNotificationController {
     ) {
         String encrypted = encryptionClient.encrypt(request.getText());
 
-        List<Long> userIds = serverClient.getRecipientsInChannel(request.getChannelId());
+        List<String> userIds = serverClient.getRecipientsInChannel(request.getChannelId());
 
         userIds.remove(request.getSenderId());
 
-        for (Long recipientId : userIds) {
+        for (String recipientId : userIds) {
 
             Notification n = notificationService.createMessageReceivedNotification(
                     request.getMessageId(),
@@ -51,7 +51,7 @@ public class InternalNotificationController {
             NotificationResponse response = mapToResponse(n, request.getText());
 
             messagingTemplate.convertAndSendToUser(
-                    recipientId.toString(),
+                    recipientId,
                     "/queue/notifications",
                     response
             );

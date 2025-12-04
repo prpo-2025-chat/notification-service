@@ -20,7 +20,7 @@ public class NotificationController {
 
     @GetMapping
     public List<NotificationResponse> getNotifications(
-            @RequestParam Long userId,
+            @RequestParam String userId,
             @RequestParam(required = false) NotificationStatus status
     ) {
         List<Notification> list = notificationService.getNotifications(userId, status);
@@ -30,7 +30,7 @@ public class NotificationController {
     }
 
     @PatchMapping("/{id}/read")
-    public void markAsRead(@PathVariable Long id, @RequestParam Long userId) {
+    public void markAsRead(@PathVariable String id, @RequestParam String userId) {
         notificationService.markAsRead(id, userId);
     }
 

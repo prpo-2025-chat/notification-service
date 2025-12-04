@@ -21,11 +21,11 @@ public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    private Long recipientId;
-    private Long senderId;
-    private long channelId;
+    private String recipientId;
+    private String senderId;
+    private String channelId;
 
     @Enumerated(EnumType.STRING)
     private NotificationType type;
@@ -36,7 +36,7 @@ public class Notification {
     @Column(columnDefinition = "TEXT")
     private String encryptedPayload;
 
-    private Long messageId;
+    private String messageId;
 
     private Instant createdAt;
     private Instant readAt;

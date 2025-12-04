@@ -16,12 +16,12 @@ public class ServerClient {
     @Value("${server.service.base-url}")
     private String baseUrl;
 
-    public List<Long> getRecipientsInChannel(Long channelId) {
+    public List<String> getRecipientsInChannel(String channelId) {
         // String url = baseUrl + "/internal/channels/" + channelId + "/members";
         // Long[] users = restTemplate.getForObject(url, Long[].class);
         // return Arrays.asList(users);
         // TODO: when server service implemented connect it
-        return List.of(2L, 3L, 4L);
+        return List.of("2", "3", "4");
     }
 }
 

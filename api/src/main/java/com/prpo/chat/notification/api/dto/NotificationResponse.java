@@ -10,18 +10,18 @@ import lombok.Data;
 @Data
 public class NotificationResponse {
 
-    private Long id;
+    private String id;
 
-    private Long recipientId;
-    private Long senderId;
-    private long channelId;
+    private String recipientId;
+    private String senderId;
+    private String channelId;
 
     private NotificationType type;
     private NotificationStatus status;
 
     private String text;
 
-    private Long messageId;
+    private String messageId;
 
     private Instant createdAt;
     private Instant readAt;
