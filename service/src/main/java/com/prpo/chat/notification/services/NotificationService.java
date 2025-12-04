@@ -24,11 +24,13 @@ public class NotificationService {
             Long messageId,
             Long senderId,
             Long recipientId,
+            Long channelId,
             String encryptedPayload
     ) {
         Notification n = new Notification();
         n.setRecipientId(recipientId);
         n.setSenderId(senderId);
+        n.setChannelId(channelId);
         n.setType(NotificationType.MESSAGE_RECEIVED);
         n.setStatus(NotificationStatus.UNREAD);
         n.setEncryptedPayload(encryptedPayload);

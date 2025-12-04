@@ -13,7 +13,7 @@ public class MessageReceivedNotificationRequest {
     private Long senderId;
 
     @NotNull
-    private Long recipientId;
+    private Long channelId;
 
     @NotNull
     private String text;

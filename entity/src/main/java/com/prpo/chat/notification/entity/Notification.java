@@ -25,6 +25,7 @@ public class Notification {
 
     private Long recipientId;
     private Long senderId;
+    private long channelId;
 
     @Enumerated(EnumType.STRING)
     private NotificationType type;
