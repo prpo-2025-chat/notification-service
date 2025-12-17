@@ -1,5 +1,6 @@
 package com.prpo.chat.notification.api.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -51,7 +52,7 @@ public class InternalNotificationController {
     ) {
         String encrypted = encryptionClient.encrypt(request.getText());
 
-        List<String> userIds = serverClient.getRecipientsInChannel(request.getChannelId());
+        List<String> userIds = new ArrayList<>(serverClient.getRecipientsInChannel(request.getChannelId()));
 
         userIds.remove(request.getSenderId());
 
