@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class ServerClient {
     private RestTemplate restTemplate;
 
-    @Value("${server.service.base-url}")
+    @Value("${server-service.base-url}")
     private String baseUrl;
 
     public List<String> getRecipientsInChannel(String channelId) {

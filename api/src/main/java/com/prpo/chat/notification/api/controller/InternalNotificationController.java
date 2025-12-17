@@ -16,11 +16,17 @@ import com.prpo.chat.notification.api.dto.NotificationResponse;
 import com.prpo.chat.notification.entity.Notification;
 import com.prpo.chat.notification.services.NotificationService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/internal/notifications")
 @RequiredArgsConstructor
+@Tag(name = "Internal Notifications", description = "Internal endpoints used by other services (not intended for FE)")
 public class InternalNotificationController {
 
     private final NotificationService notificationService;
@@ -28,9 +34,20 @@ public class InternalNotificationController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ServerClient serverClient;
 
+    @Operation(
+        summary = "Handle message-received event",
+        description = "Internal endpoint called by other services when a new message is created. " +
+                      "Creates notifications for channel recipients (excluding the sender) and pushes them via WebSocket."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Notifications created and dispatched (no response body)"),
+        @ApiResponse(responseCode = "400", description = "Invalid request payload"),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error")
+    })
     @PostMapping("/message-received")
     public void handleMessageReceived(
-            @Validated @RequestBody MessageReceivedNotificationRequest request
+        @Parameter(description = "Message-received payload", required = true)
+        @Validated @RequestBody MessageReceivedNotificationRequest request
     ) {
         String encrypted = encryptionClient.encrypt(request.getText());
 
@@ -41,23 +58,22 @@ public class InternalNotificationController {
         for (String recipientId : userIds) {
 
             Notification n = notificationService.createMessageReceivedNotification(
-                    request.getMessageId(),
-                    request.getSenderId(),
-                    recipientId,
-                    request.getChannelId(),
-                    encrypted
+                request.getMessageId(),
+                request.getSenderId(),
+                recipientId,
+                request.getChannelId(),
+                encrypted
             );
 
             NotificationResponse response = mapToResponse(n, request.getText());
 
             messagingTemplate.convertAndSendToUser(
-                    recipientId,
-                    "/queue/notifications",
-                    response
+                recipientId,
+                "/queue/notifications",
+                response
             );
         }
     }
-
 
     private NotificationResponse mapToResponse(Notification n, String plainText) {
         NotificationResponse dto = new NotificationResponse();
@@ -70,7 +86,7 @@ public class InternalNotificationController {
         dto.setMessageId(n.getMessageId());
         dto.setCreatedAt(n.getCreatedAt());
         dto.setReadAt(n.getReadAt());
-        dto.setText(plainText); // show decrypted text to FE
+        dto.setText(plainText);
         return dto;
     }
 }

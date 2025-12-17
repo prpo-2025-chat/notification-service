@@ -14,6 +14,15 @@ spring:
 server:
   port: 8085
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui
+
 encryption:
   service:
     base-url: http://localhost:8082/encryption
+
+server-service:
+  base-url: http://localhost:8082/server
