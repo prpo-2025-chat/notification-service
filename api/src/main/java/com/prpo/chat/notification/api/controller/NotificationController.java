@@ -84,6 +84,7 @@ public class NotificationController {
         dto.setId(n.getId());
         dto.setRecipientId(n.getRecipientId());
         dto.setSenderId(n.getSenderId());
+        dto.setChannelId(n.getChannelId());
         dto.setType(n.getType());
         dto.setStatus(n.getStatus());
         dto.setMessageId(n.getMessageId());
