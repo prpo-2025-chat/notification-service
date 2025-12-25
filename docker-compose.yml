@@ -11,7 +11,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: Umobolnica93
 
       ENCRYPTION_SERVICE_BASE_URL: http://encryption:8082/encryption
-      SERVER_SERVICE_BASE_URL: http://server:8082/server
+      SERVER_SERVICE_BASE_URL: http://server:8031/api/servers
     networks:
       - chat-net
     depends_on:
