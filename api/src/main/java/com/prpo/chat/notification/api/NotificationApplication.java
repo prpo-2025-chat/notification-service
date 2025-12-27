@@ -5,12 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication(scanBasePackages = {
-    "com.prpo.chat.notification.api",
-    "com.prpo.chat.notification.services",
-    "com.prpo.chat.notification.repository",
-    "com.prpo.chat.notification.entity"
-})
+@SpringBootApplication(scanBasePackages = "com.prpo.chat.notification")
 @EnableJpaRepositories(basePackages = "com.prpo.chat.notification.repository")
 @EntityScan(basePackages = "com.prpo.chat.notification.entity")
 public class NotificationApplication {

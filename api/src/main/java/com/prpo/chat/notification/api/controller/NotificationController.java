@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.prpo.chat.notification.api.client.EncryptionClient;
 import com.prpo.chat.notification.api.dto.NotificationResponse;
-import com.prpo.chat.notification.entity.Notification;
 import com.prpo.chat.notification.entity.NotificationStatus;
 import com.prpo.chat.notification.services.NotificationService;
 
@@ -31,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 public class NotificationController {
 
     private final NotificationService notificationService;
-    private final EncryptionClient encryptionClient;
 
     @Operation(
         summary = "Get notifications for a user",
@@ -53,10 +50,7 @@ public class NotificationController {
         @Parameter(description = "Optional status filter", required = false)
         @RequestParam(required = false) NotificationStatus status
     ) {
-        List<Notification> list = notificationService.getNotifications(userId, status);
-        return list.stream()
-            .map(this::mapToResponse)
-            .toList();
+        return notificationService.getNotificationResponses(userId, status);
     }
 
     @Operation(
@@ -77,23 +71,5 @@ public class NotificationController {
         @RequestParam String userId
     ) {
         notificationService.markAsRead(id, userId);
-    }
-
-    private NotificationResponse mapToResponse(Notification n) {
-        NotificationResponse dto = new NotificationResponse();
-        dto.setId(n.getId());
-        dto.setRecipientId(n.getRecipientId());
-        dto.setSenderId(n.getSenderId());
-        dto.setChannelId(n.getChannelId());
-        dto.setType(n.getType());
-        dto.setStatus(n.getStatus());
-        dto.setMessageId(n.getMessageId());
-        dto.setCreatedAt(n.getCreatedAt());
-        dto.setReadAt(n.getReadAt());
-
-        String plainText = encryptionClient.decrypt(n.getEncryptedPayload());
-        dto.setText(plainText);
-
-        return dto;
     }
 }

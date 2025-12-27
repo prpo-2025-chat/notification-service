@@ -1,20 +1,12 @@
 package com.prpo.chat.notification.api.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.prpo.chat.notification.api.client.EncryptionClient;
-import com.prpo.chat.notification.api.client.ServerClient;
 import com.prpo.chat.notification.api.dto.MessageReceivedNotificationRequest;
-import com.prpo.chat.notification.api.dto.NotificationResponse;
-import com.prpo.chat.notification.entity.Notification;
 import com.prpo.chat.notification.services.NotificationService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,9 +23,6 @@ import lombok.RequiredArgsConstructor;
 public class InternalNotificationController {
 
     private final NotificationService notificationService;
-    private final EncryptionClient encryptionClient;
-    private final SimpMessagingTemplate messagingTemplate;
-    private final ServerClient serverClient;
 
     @Operation(
         summary = "Handle message-received event",
@@ -50,44 +39,11 @@ public class InternalNotificationController {
         @Parameter(description = "Message-received payload", required = true)
         @Validated @RequestBody MessageReceivedNotificationRequest request
     ) {
-        String encrypted = encryptionClient.encrypt(request.getText());
-
-        List<String> userIds = new ArrayList<>(serverClient.getRecipientsInChannel(request.getChannelId()));
-
-        userIds.remove(request.getSenderId());
-
-        for (String recipientId : userIds) {
-
-            Notification n = notificationService.createMessageReceivedNotification(
+        notificationService.handleMessageReceived(
                 request.getMessageId(),
                 request.getSenderId(),
-                recipientId,
                 request.getChannelId(),
-                encrypted
-            );
-
-            NotificationResponse response = mapToResponse(n, request.getText());
-
-            messagingTemplate.convertAndSendToUser(
-                recipientId,
-                "/queue/notifications",
-                response
-            );
-        }
-    }
-
-    private NotificationResponse mapToResponse(Notification n, String plainText) {
-        NotificationResponse dto = new NotificationResponse();
-        dto.setId(n.getId());
-        dto.setRecipientId(n.getRecipientId());
-        dto.setSenderId(n.getSenderId());
-        dto.setChannelId(n.getChannelId());
-        dto.setType(n.getType());
-        dto.setStatus(n.getStatus());
-        dto.setMessageId(n.getMessageId());
-        dto.setCreatedAt(n.getCreatedAt());
-        dto.setReadAt(n.getReadAt());
-        dto.setText(plainText);
-        return dto;
+                request.getText()
+        );
     }
 }

@@ -1,4 +1,4 @@
-package com.prpo.chat.notification.api.client;
+package com.prpo.chat.notification.client;
 
 import java.util.List;
 

@@ -25,4 +25,4 @@ encryption:
     base-url: ${ENCRYPTION_SERVICE_BASE_URL:http://localhost:8082/encryption}
 
 server-service:
-  base-url: ${SERVER_SERVICE_BASE_URL:http://localhost:8031/api/servers}
+  base-url: ${SERVER_SERVICE_BASE_URL:http://localhost:8031/api/}
