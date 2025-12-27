@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.prpo.chat.notification.api.dto.NotificationResponse;
 import com.prpo.chat.notification.client.EncryptionClient;
@@ -21,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+
+    private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
 
     private final NotificationRepository notificationRepository;
     private final EncryptionClient encryptionClient;
@@ -50,11 +54,21 @@ public class NotificationService {
 
             NotificationResponse response = mapToResponse(n, text);
 
-            messagingTemplate.convertAndSendToUser(
-                    recipientId,
-                    "/queue/notifications",
-                    response
-            );
+            try {
+                log.info("Dispatching notification {} to user {} on /queue/notifications", n.getId(), recipientId);
+                messagingTemplate.convertAndSendToUser(
+                        recipientId,
+                        "/queue/notifications",
+                        response
+                );
+                messagingTemplate.convertAndSend(
+                        "/topic/notifications." + recipientId,
+                        response
+                );
+            } catch (Exception e) {
+                // Keep the persisted notification; just log the dispatch failure.
+                log.warn("Failed to push notification to user {} via STOMP: {}", recipientId, e.getMessage());
+            }
         }
     }
 
