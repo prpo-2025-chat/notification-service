@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.prpo.chat.notification.dto.ServerDto;
+
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -38,6 +40,15 @@ public class ServerClient {
             ).getBody();
         } catch (RestClientException e) {
             throw new RuntimeException("Failed to fetch server members", e);
+        }
+    }
+
+    public ServerDto getServerById(String serverId) {
+        try {
+            String url = baseUrl + "servers/" + serverId;
+            return restTemplate.getForObject(url, ServerDto.class);
+        } catch (RestClientException e) {
+            throw new RuntimeException("Failed to fetch server by id", e);
         }
     }
 }

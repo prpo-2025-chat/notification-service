@@ -4,15 +4,20 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.prpo.chat.notification.api.dto.NotificationResponse;
 import com.prpo.chat.notification.client.EncryptionClient;
+import com.prpo.chat.notification.client.SendGridEmailSender;
 import com.prpo.chat.notification.client.ServerClient;
+import com.prpo.chat.notification.client.UserClient;
+import com.prpo.chat.notification.dto.ServerDto;
+import com.prpo.chat.notification.dto.UserDto;
 import com.prpo.chat.notification.entity.Notification;
 import com.prpo.chat.notification.entity.NotificationStatus;
 import com.prpo.chat.notification.entity.NotificationType;
@@ -29,7 +34,10 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final EncryptionClient encryptionClient;
     private final SimpMessagingTemplate messagingTemplate;
+    private final SimpUserRegistry userRegistry;
     private final ServerClient serverClient;
+    private final UserClient userClient;
+    private final SendGridEmailSender emailSender;
 
     @Transactional
     public void handleMessageReceived(
@@ -54,20 +62,26 @@ public class NotificationService {
 
             NotificationResponse response = mapToResponse(n, text);
 
-            try {
-                log.info("Dispatching notification {} to user {} on /queue/notifications", n.getId(), recipientId);
-                messagingTemplate.convertAndSendToUser(
-                        recipientId,
-                        "/queue/notifications",
-                        response
-                );
-                messagingTemplate.convertAndSend(
-                        "/topic/notifications." + recipientId,
-                        response
-                );
-            } catch (Exception e) {
-                // Keep the persisted notification; just log the dispatch failure.
-                log.warn("Failed to push notification to user {} via STOMP: {}", recipientId, e.getMessage());
+            if (isUserOnline(recipientId)) {
+                try {
+                    log.info("Dispatching notification {} to user {} on /queue/notifications", n.getId(), recipientId);
+                    messagingTemplate.convertAndSendToUser(
+                            recipientId,
+                            "/queue/notifications",
+                            response
+                    );
+                    messagingTemplate.convertAndSend(
+                            "/topic/notifications." + recipientId,
+                            response
+                    );
+                } catch (Exception e) {
+                    // Keep the persisted notification; just log the dispatch failure.
+                    log.warn("Failed to push notification to user {} via STOMP: {}", recipientId, e.getMessage());
+                    sendEmailFallback(recipientId, senderId, channelId, text);
+                }
+            } else {
+                log.info("User {} is offline; sending email notification.", recipientId);
+                sendEmailFallback(recipientId, senderId, channelId, text);
             }
         }
     }
@@ -143,5 +157,40 @@ public class NotificationService {
         dto.setReadAt(n.getReadAt());
         dto.setText(plainText);
         return dto;
+    }
+
+    private boolean isUserOnline(String userId) {
+        var user = userRegistry.getUser(userId);
+        return user != null && !user.getSessions().isEmpty();
+    }
+
+    private void sendEmailFallback(String recipientId, String senderId, String channelId, String text) {
+        try {
+            UserDto user = userClient.getUserById(recipientId);
+            if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
+                log.warn("Missing email for user {}; skipping email fallback.", recipientId);
+                return;
+            }
+
+            String channelName = resolveChannelName(channelId);
+            String subject = "New message in " + (channelName == null ? channelId : channelName);
+            String body = "You have a new message from user " + user.getUsername() + ":\n\n" + text;
+            emailSender.send(user.getEmail(), subject, body);
+        } catch (Exception e) {
+            log.warn("Failed to send email notification to user {}: {}", recipientId, e.getMessage());
+        }
+    }
+
+    private String resolveChannelName(String channelId) {
+        try {
+            ServerDto server = serverClient.getServerById(channelId);
+            if (server == null || server.getName() == null || server.getName().isBlank()) {
+                return null;
+            }
+            return server.getName();
+        } catch (Exception e) {
+            log.warn("Failed to resolve channel name for {}: {}", channelId, e.getMessage());
+            return null;
+        }
     }
 }

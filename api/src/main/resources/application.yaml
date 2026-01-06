@@ -43,3 +43,10 @@ encryption:
 
 server-service:
   base-url: ${SERVER_SERVICE_BASE_URL:http://localhost:8031/api/}
+
+user-service:
+  base-url: ${USER_SERVICE_BASE_URL:http://localhost:8032/api/users/}
+
+sendgrid:
+  api-key: ${SENDGRID_API_KEY}
+  from: ${SENDGRID_FROM_EMAIL}

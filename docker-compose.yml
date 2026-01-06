@@ -12,6 +12,7 @@ services:
 
       ENCRYPTION_SERVICE_BASE_URL: http://encryption:8082/encryption
       SERVER_SERVICE_BASE_URL: http://server:8031/api/
+      USER_SERVICE_BASE_URL: http://user:8032/api/users/
     networks:
       - chat-net
     depends_on:
