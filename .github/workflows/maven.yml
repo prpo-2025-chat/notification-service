@@ -28,7 +28,5 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      env:
-        CHAT_APP_ENCRYPTION_PASSWORD: "random-string-123"
       run: |
         mvn clean install
