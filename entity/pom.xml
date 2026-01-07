@@ -12,6 +12,7 @@
     <groupId>com.prpo.chat</groupId>
     <artifactId>notification-entity</artifactId>
     <name>notification-entity</name>
+    <version>1.0.0-SNAPSHOT</version>
 
     <dependencies>
     
