@@ -28,7 +28,7 @@
 
         <dependency>
             <groupId>com.prpo.chat</groupId>
-            <artifactId>entity</artifactId>
+            <artifactId>notification-entity</artifactId>
             <version>${project.version}</version>
         </dependency>
 
