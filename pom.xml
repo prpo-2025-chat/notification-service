@@ -17,8 +17,8 @@
 
     <modules>
         <module>api</module>
-        <module>entity</module>
         <module>service</module>
+        <module>entity</module>
     </modules>
 
     <properties>
