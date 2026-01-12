@@ -22,8 +22,8 @@ WORKDIR /app
 
 COPY --from=build /app/api/target/*.jar /app/app.jar
 
-EXPOSE 8085
+ENV ENCRYPTION_SERVICE_BASE_URL=http://encryption:8082/encryption SERVER_SERVICE_BASE_URL=http://svc:8031/api/ USER_SERVICE_BASE_URL=http://user:8032/api/users/
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl -fsS http://localhost:8085/health || exit 1
+EXPOSE 8085
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
