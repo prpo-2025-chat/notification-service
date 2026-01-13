@@ -7,15 +7,17 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prpo.chat.notification.api.dto.NotificationResponse;
 import com.prpo.chat.notification.client.EncryptionClient;
+import com.prpo.chat.notification.client.PresenceClient;
 import com.prpo.chat.notification.client.SendGridEmailSender;
 import com.prpo.chat.notification.client.ServerClient;
 import com.prpo.chat.notification.client.UserClient;
+import com.prpo.chat.notification.dto.PresenceDto;
+import com.prpo.chat.notification.dto.PresenceStatus;
 import com.prpo.chat.notification.dto.ServerDto;
 import com.prpo.chat.notification.dto.UserDto;
 import com.prpo.chat.notification.entity.Notification;
@@ -34,7 +36,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final EncryptionClient encryptionClient;
     private final SimpMessagingTemplate messagingTemplate;
-    private final SimpUserRegistry userRegistry;
+    private final PresenceClient presenceClient;
     private final ServerClient serverClient;
     private final UserClient userClient;
     private final SendGridEmailSender emailSender;
@@ -160,8 +162,13 @@ public class NotificationService {
     }
 
     private boolean isUserOnline(String userId) {
-        var user = userRegistry.getUser(userId);
-        return user != null && !user.getSessions().isEmpty();
+        PresenceDto presence = presenceClient.getUserStatus(userId);
+
+        if(presence == null) {
+            return false;
+        }
+        
+        return presence.getStatus() == PresenceStatus.ONLINE;
     }
 
     private void sendEmailFallback(String recipientId, String senderId, String channelId, String text) {

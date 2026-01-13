@@ -47,6 +47,10 @@ server-service:
 user-service:
   base-url: ${USER_SERVICE_BASE_URL:http://localhost:8032/api/users/}
 
+presence:
+  service:
+    base-url: ${PRESENCE_SERVICE_BASE_URL:http://localhost:8081/presence}
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY}
   from: ${SENDGRID_FROM_EMAIL}

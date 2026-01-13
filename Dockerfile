@@ -22,7 +22,7 @@ WORKDIR /app
 
 COPY --from=build /app/api/target/*.jar /app/app.jar
 
-ENV ENCRYPTION_SERVICE_BASE_URL=http://encryption:8082/encryption SERVER_SERVICE_BASE_URL=http://svc:8031/api/ USER_SERVICE_BASE_URL=http://user:8032/api/users/
+ENV ENCRYPTION_SERVICE_BASE_URL=http://encryption:8082/encryption SERVER_SERVICE_BASE_URL=http://svc:8031/api/ USER_SERVICE_BASE_URL=http://user:8032/api/users/ PRESENCE_SERVICE_BASE_URL=http://presence:8081/presence
 
 EXPOSE 8085
 

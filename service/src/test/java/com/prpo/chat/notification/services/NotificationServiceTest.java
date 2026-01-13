@@ -1,19 +1,18 @@
 package com.prpo.chat.notification.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.time.Instant;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 
 import com.prpo.chat.notification.client.EncryptionClient;
+import com.prpo.chat.notification.client.PresenceClient;
 import com.prpo.chat.notification.client.SendGridEmailSender;
 import com.prpo.chat.notification.client.ServerClient;
 import com.prpo.chat.notification.client.UserClient;
@@ -28,7 +27,7 @@ class NotificationServiceTest {
         NotificationRepository repository = mock(NotificationRepository.class);
         EncryptionClient encryptionClient = mock(EncryptionClient.class);
         SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
-        SimpUserRegistry userRegistry = mock(SimpUserRegistry.class);
+        PresenceClient presenceClient = mock(PresenceClient.class);
         ServerClient serverClient = mock(ServerClient.class);
         UserClient userClient = mock(UserClient.class);
         SendGridEmailSender emailSender = mock(SendGridEmailSender.class);
@@ -37,7 +36,7 @@ class NotificationServiceTest {
             repository,
             encryptionClient,
             messagingTemplate,
-            userRegistry,
+            presenceClient,
             serverClient,
             userClient,
             emailSender
